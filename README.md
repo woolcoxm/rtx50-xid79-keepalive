@@ -22,7 +22,7 @@ next person. If it does not, say that too.
   Windows and the driver settings.
 - What stopped it: **a tiny second program that keeps a CUDA context open on the card.** It holds
   256 MiB of the card's memory, does no computing, and starts at sign-in.
-- Same load that crashed the card 3 times out of 3: **25 full model loads with the keep-alive running,
+- Same load that crashed the card 3 times out of 3: **30 full model loads with the keep-alive running,
   none crashed**, plus 20 minutes of AI workload and 3 minutes of heavy load. It also passed a check
   after a cold restart, with the keep-alive starting by itself.
 - Nobody knows why. This is a workaround for a card fault, not a repair. It has been tried on exactly
@@ -86,7 +86,9 @@ the very first thing the card did after a restart.
 
 ### During the session
 
-All four changes below were in place for crashes 2 and 3. They did not stop the crash.
+All four changes below were in place for crashes 2 and 3. They did not stop the crash. They were all
+put back afterwards, and the keep-alive then passed the same load five more times, so it does not
+depend on any of them.
 
 | Change | What came of it |
 |---|---|
@@ -122,14 +124,16 @@ Every load below is the same 1.9 GB model loaded through CUDA, starting from an 
 | Card state before the load | Result |
 |---|---|
 | Nothing holding it | **0 of 3 passed** (crashes 1, 2 and 3) |
-| A keep-alive holding it | **25 of 25 passed** |
+| A keep-alive holding it | **30 of 30 passed** |
 
-Of the 25, 24 started from the deepest idle state (P8, about 13 W) and 1 from a light-idle state
-(P5, 21 W). Seven ran with an early stand-in helper (a small llama.cpp server holding a context), ten
-with the Python keep-alive in this repo, and eight with the `.exe`: three with the exact build in this
-repo, five with a build that differed only in how it wrote its log file. The Python file in the repo
-differs from the tested one only in its opening comment. The sensor recordings are in the
-[evidence](evidence/README.md) folder. All of this was measured on 2026-11-26.
+Of the 30, 29 started from the deepest idle state (P8, about 13 W) and 1 from a light-idle state
+(P5, 21 W). Seven ran with an early stand-in helper (a small llama.cpp server holding a context),
+fifteen with the Python keep-alive in this repo, and eight with the `.exe`: three with the exact
+build in this repo, five with a build that differed only in how it wrote its log file. The Python
+file in the repo differs from the tested one only in its opening comment. The last five runs were
+made after the four settings above had been put back, with nothing changed on the PC except the
+keep-alive. The sensor recordings are in the [evidence](evidence/README.md) folder. All of this was
+measured on 2026-11-26.
 
 With a keep-alive running, the card also got through:
 
@@ -211,9 +215,8 @@ initialized state that a cold card is missing when a large load arrives.
    next. The tests here used a small public model through llama.cpp.
 3. **No reverse test after the fix.** Once the keep-alive was found, it was never deliberately stopped
    to watch the crash return. The comparison is the three crashes without it.
-4. **Four settings from the failed attempts are still applied on the owner's PC** (see the table
-   above), and the keep-alive has only been tried with them in place. They did not stop the crash, but
-   it is not known whether the keep-alive needs any of them.
+4. **PCIe Gen3 only.** The link was at Gen3 for every test here. Before the keep-alive existed, the
+   card had also crashed at Gen4 and Gen5. Gen5 with the keep-alive is the next test.
 5. **The root cause is unknown**, and this does not fix it. The card is still faulty. Keep your logs
    and pursue a replacement or a refund.
 6. **Windows and NVIDIA only.** The same idea should work on Linux (any small process holding a CUDA

@@ -35,6 +35,7 @@ State" off). They did not prevent the crash.
 |---|---|
 | `ok_19-01-12_full-load-with-keepalive_20-readings-per-second.csv` | 34 seconds at 20 readings per second: a tiny warm-up load, the start of the keep-alive, then the same 1.9 GB model load and benchmark that crashed the card three times. About 0.5 s of readings are missing at 19:01:35 while the upload happened; the card then stepped up its clocks and ran the benchmark. |
 | `ok_19-34-26_cold-restart_with-keepalive_5-loads-and-3-min-heavy.csv` | The whole check after a cold restart with the keep-alive starting by itself: five full model loads from idle, then three minutes of heavy load (peak 251 W, 67 °C, fans up to 55%). |
+| `ok_20-08-35_helper-only_all-four-settings-reverted.csv` | Five more full model loads after all four settings had been put back to their original values, with nothing changed on the PC except the keep-alive. |
 
 ## Columns
 
