@@ -5,8 +5,9 @@ program, the install scripts and this report were **written by that AI**. The ow
 find the fix and did not write any of the code. The owner provided the broken hardware and five months
 of failed attempts, allowed the changes, clicked "Yes" on the Windows permission prompts, signed back
 in after each restart, checked the results as they came in, and asked for all of this to be said
-plainly. The assistant was ZCode, running the GLM 5.4 model from Z.ai. The owner has not yet played a
-game or run their own AI programs with the fix in place (see [Limits](#limits-and-unknowns)).
+plainly. The assistant was ZCode, running the GLM 5.4 model from Z.ai. The owner has since used the
+card for their own workloads and reports that it is working; those sessions were not recorded beyond
+what the Windows event log and the keep-alive's own log show (see [Limits](#limits-and-unknowns)).
 
 If this helps you, an issue saying so (card model, driver version, what you were doing) would help the
 next person. If it does not, say that too.
@@ -25,6 +26,8 @@ next person. If it does not, say that too.
 - Same load that crashed the card 3 times out of 3: **35 full model loads with the keep-alive running,
   none crashed**, plus 20 minutes of AI workload and two 3-minute heavy loads. It also passed checks
   after two cold restarts, at PCIe Gen3 and at Gen5, with the keep-alive starting by itself.
+- Since then, about 15 hours of uptime with the keep-alive running while another program kept the
+  card at 100% load and 300 W: zero driver errors and zero hardware errors in the Windows event log.
 - Nobody knows why. This is a workaround for a card fault, not a repair. It has been tried on exactly
   one card.
 
@@ -38,7 +41,7 @@ next person. If it does not, say that too.
 | PCIe link | 8 lanes; set to Gen3 in the BIOS for most tests, Gen5 for the last ten (Gen1 at idle is normal) |
 | Driver | NVIDIA 610.88, installed automatically by Windows Update |
 | OS | Windows 11 Pro, 26H2 |
-| Display | The monitor is on the mini PC's Intel graphics, so the 5070 Ti has no display attached |
+| Display | For the tests: the monitor was on the mini PC's Intel graphics, so the 5070 Ti had no display attached. Since the evening of 2026-11-26 the Intel graphics are disabled and the monitor is on the 5070 Ti |
 
 An RTX 3060 had run in the same dock for months without a problem, and the owner reports the 5070 Ti
 failed the same way in other PCs. So for this card the dock and the mini PC are not the cause.
@@ -142,6 +145,10 @@ With a keep-alive running, the card also got through:
   258 W, 66 °C), fans up to 55%, and no Windows hardware-error events.
 - Two cold restarts (Gen3 and Gen5), with the keep-alive starting by itself at sign-in before anything
   else.
+- About 15 hours of uptime from the evening of 2026-11-26 (21:02 that day to 11:52 the next) while
+  another program kept the card at full load (299–301 W and 98–100% busy in a one-minute recording).
+  The Windows event log shows zero NVIDIA driver events, zero hardware-error events and no unexpected
+  shutdowns for the whole period. Only one minute of it was recorded.
 
 ### What it costs
 
@@ -213,8 +220,9 @@ initialized state that a cold card is missing when a large load arrives.
 ## Limits and unknowns
 
 1. **One card, one PC, one afternoon.** An MSI RTX 5070 Ti in a Beelink dock on a GTi14, driver 610.88.
-2. **The owner's own programs have not been tried yet.** Games, Strata, LM Studio and Ollama come
-   next. The tests here used a small public model through llama.cpp.
+2. **The owner's own programs were not recorded.** The owner reports that games and AI programs now
+   work with the keep-alive in place. The tests here used small public models through llama.cpp. A
+   planned 10-hour run of AI workloads was skipped.
 3. **No reverse test after the fix.** Once the keep-alive was found, it was never deliberately stopped
    to watch the crash return. The comparison is the three crashes without it.
 4. **One dock, mini PC and driver.** The link was at Gen3 for most of the tests and at Gen5 for the
@@ -223,6 +231,10 @@ initialized state that a cold card is missing when a large load arrives.
    and pursue a replacement or a refund.
 6. **Windows and NVIDIA only.** The same idea should work on Linux (any small process holding a CUDA
    context), but that has not been tried.
+7. **Two display setups.** The tests up to the Gen5 check ran with no display on the 5070 Ti, so the
+   card dropped to its deepest idle between loads. Since the evening of 2026-11-26 the monitor is on
+   the card itself, where it idles at about 30 W and never reaches that deepest state. The 15-hour
+   period above is with the display on the card.
 
 ## Mistakes made along the way
 

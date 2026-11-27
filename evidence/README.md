@@ -37,6 +37,20 @@ State" off). They did not prevent the crash.
 | `ok_19-34-26_cold-restart_with-keepalive_5-loads-and-3-min-heavy.csv` | The whole check after a cold restart with the keep-alive starting by itself: five full model loads from idle, then three minutes of heavy load (peak 251 W, 67 °C, fans up to 55%). |
 | `ok_20-08-35_helper-only_all-four-settings-reverted.csv` | Five more full model loads after all four settings had been put back to their original values, with nothing changed on the PC except the keep-alive. |
 | `ok_20-15-10_gen5_helper-only_cold-restart_5-loads-and-3-min-heavy.csv` | The same check again after another cold restart, with the link set to Gen5 in the BIOS: the keep-alive starting by itself, five full model loads from idle, then three minutes of heavy load (peak 258 W, 66 °C, fans up to 54%). The `pcie_gen` column reads 5 in every reading taken under load. |
+| `ok_2026-11-27_11-54_full-load-for-one-minute_5-readings-per-second.csv` | One minute, at 5 readings per second, of the card under another program's full load about 15 hours after a restart: 299–301 W, 98–100% busy, 66–67 °C, with the keep-alive running. Only this minute of that period was recorded. |
+
+## The Windows event log
+
+Checked on 2026-11-27 at 11:51, for the whole time since the restart at 21:02 the day before (about
+14.8 hours), with the keep-alive running throughout:
+
+| Entries from `nvlddmkm` (the NVIDIA driver) | 0 |
+|---|---|
+| Hardware-error events (WHEA-Logger) | 0 |
+| Unexpected shutdowns (Kernel-Power 41) | 0 |
+
+The keep-alive's own log for that time has only its two start-up lines ("started", "holding a 256
+MiB CUDA context on the card") and no "CARD STOPPED ANSWERING".
 
 ## Columns
 
