@@ -1,0 +1,9 @@
+# The helper's own log (created wherever it runs)
+gpu_keepalive.log
+
+# Build output other than the shipped exe
+*.pdb
+bin/
+obj/
+__pycache__/
+*.pyc
