@@ -22,9 +22,9 @@ next person. If it does not, say that too.
   Windows and the driver settings.
 - What stopped it: **a tiny second program that keeps a CUDA context open on the card.** It holds
   256 MiB of the card's memory, does no computing, and starts at sign-in.
-- Same load that crashed the card 3 times out of 3: **30 full model loads with the keep-alive running,
-  none crashed**, plus 20 minutes of AI workload and 3 minutes of heavy load. It also passed a check
-  after a cold restart, with the keep-alive starting by itself.
+- Same load that crashed the card 3 times out of 3: **35 full model loads with the keep-alive running,
+  none crashed**, plus 20 minutes of AI workload and two 3-minute heavy loads. It also passed checks
+  after two cold restarts, at PCIe Gen3 and at Gen5, with the keep-alive starting by itself.
 - Nobody knows why. This is a workaround for a card fault, not a repair. It has been tried on exactly
   one card.
 
@@ -35,7 +35,7 @@ next person. If it does not, say that too.
 | Graphics card | MSI GeForce RTX 5070 Ti, 16 GB, VBIOS `98.03.58.00.9d` |
 | Mini PC | Beelink GTi14 (Intel Core Ultra 9 185H), BIOS `GTi14T208` of 2026-07-09, 32 GB RAM |
 | GPU dock | Beelink EX Pro (the PCIe 5.0 version), connected to the GTi14's bottom PCIe port |
-| PCIe link | 8 lanes, set to Gen3 in the BIOS (Gen1 at idle is normal) |
+| PCIe link | 8 lanes; set to Gen3 in the BIOS for most tests, Gen5 for the last ten (Gen1 at idle is normal) |
 | Driver | NVIDIA 610.88, installed automatically by Windows Update |
 | OS | Windows 11 Pro, 26H2 |
 | Display | The monitor is on the mini PC's Intel graphics, so the 5070 Ti has no display attached |
@@ -124,22 +124,24 @@ Every load below is the same 1.9 GB model loaded through CUDA, starting from an 
 | Card state before the load | Result |
 |---|---|
 | Nothing holding it | **0 of 3 passed** (crashes 1, 2 and 3) |
-| A keep-alive holding it | **30 of 30 passed** |
+| A keep-alive holding it | **35 of 35 passed** |
 
-Of the 30, 29 started from the deepest idle state (P8, about 13 W) and 1 from a light-idle state
+Of the 35, 34 started from the deepest idle state (P8, about 13 W) and 1 from a light-idle state
 (P5, 21 W). Seven ran with an early stand-in helper (a small llama.cpp server holding a context),
-fifteen with the Python keep-alive in this repo, and eight with the `.exe`: three with the exact
+twenty with the Python keep-alive in this repo, and eight with the `.exe`: three with the exact
 build in this repo, five with a build that differed only in how it wrote its log file. The Python
-file in the repo differs from the tested one only in its opening comment. The last five runs were
-made after the four settings above had been put back, with nothing changed on the PC except the
-keep-alive. The sensor recordings are in the [evidence](evidence/README.md) folder. All of this was
-measured on 2026-11-26.
+file in the repo differs from the tested one only in its opening comment. The last ten runs were made
+after the four settings above had been put back, with nothing changed on the PC except the
+keep-alive: five at Gen3, and five at Gen5 after another cold restart. The sensor recordings are in
+the [evidence](evidence/README.md) folder. All of this was measured on 2026-11-26.
 
 With a keep-alive running, the card also got through:
 
 - 20 minutes of AI workload with pauses between requests: 50 requests, none failed.
-- 3 minutes of heavy load after a cold restart: 11 runs, peaking at 251 W and 67 °C, fans up to 55%.
-- A cold restart, with the keep-alive starting by itself at sign-in, before anything else.
+- 3 minutes of heavy load after a cold restart, twice: at Gen3 (peak 251 W, 67 °C) and at Gen5 (peak
+  258 W, 66 °C), fans up to 55%, and no Windows hardware-error events.
+- Two cold restarts (Gen3 and Gen5), with the keep-alive starting by itself at sign-in before anything
+  else.
 
 ### What it costs
 
@@ -215,8 +217,8 @@ initialized state that a cold card is missing when a large load arrives.
    next. The tests here used a small public model through llama.cpp.
 3. **No reverse test after the fix.** Once the keep-alive was found, it was never deliberately stopped
    to watch the crash return. The comparison is the three crashes without it.
-4. **PCIe Gen3 only.** The link was at Gen3 for every test here. Before the keep-alive existed, the
-   card had also crashed at Gen4 and Gen5. Gen5 with the keep-alive is the next test.
+4. **One dock, mini PC and driver.** The link was at Gen3 for most of the tests and at Gen5 for the
+   last ten. No other card, dock, mini PC or driver version has been tried.
 5. **The root cause is unknown**, and this does not fix it. The card is still faulty. Keep your logs
    and pursue a replacement or a refund.
 6. **Windows and NVIDIA only.** The same idea should work on Linux (any small process holding a CUDA
